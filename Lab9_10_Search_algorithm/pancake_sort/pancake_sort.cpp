@@ -28,19 +28,19 @@ int findMaxIndex(const vector<int>& arr, int n) {
 // Основная функция блинной сортировки
 void pancakeSort(vector<int>& arr) {
     int n = arr.size();
-    
+
     // Начинаем с полного вектора и уменьшаем размер на 1 на каждой итерации
     for (int curr_size = n; curr_size > 1; curr_size--) {
         // Находим индекс максимального элемента в несортированной части
         int max_index = findMaxIndex(arr, curr_size);
-        
+
         // Если максимальный элемент не на своем месте
         if (max_index != curr_size - 1) {
             // Переворачиваем вектор до максимального элемента
             if (max_index != 0) {
                 flip(arr, max_index);
             }
-            
+
             // Переворачиваем весь несортированный вектор
             flip(arr, curr_size - 1);
         }
@@ -58,15 +58,15 @@ void printVector(const vector<int>& arr) {
 // Пример использования
 int main() {
     vector<int> arr = {23, 10, 20, 11, 12, 6, 7};
-    
-    cout << "Исходный массив: ";
+
+    cout << "Start array: ";
     printVector(arr);
-    
+
     vector<int> sorted_arr = arr;
     pancakeSort(sorted_arr);
-    
-    cout << "Отсортированный массив: ";
+
+    cout << "Sorted array: ";
     printVector(sorted_arr);
-    
+
     return 0;
 }
