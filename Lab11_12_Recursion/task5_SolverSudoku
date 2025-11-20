@@ -1,0 +1,160 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int N = 9;
+
+class SudokuSolver {
+private:
+    bool isValid(vector<vector<int>>& board, int row, int col, int num) {
+        // Проверка строки и столбца
+        for (int x = 0; x < N; x++) {
+            if (board[row][x] == num || board[x][col] == num) {
+                return false;
+            }
+        }
+        
+        // Проверка квадрата 3x3
+        int startRow = (row / 3) * 3;
+        int startCol = (col / 3) * 3;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[startRow + i][startCol + j] == num) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+public:
+    bool solveSudoku(vector<vector<int>>& board) {
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                // Находим пустую клетку
+                if (board[row][col] == 0) {
+                    // Пробуем все возможные цифры
+                    for (int num = 1; num <= 9; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            
+                            if (solveSudoku(board)) {
+                                return true;
+                            }
+                            
+                            // Backtrack
+                            board[row][col] = 0;
+                        }
+                    }
+                    return false; // Не нашли подходящую цифру
+                }
+            }
+        }
+        return true; // Все клетки заполнены
+    }
+    
+    // Функция для красивого вывода судоку
+    void printSudoku(vector<vector<int>>& board) {
+        cout << "┌─────────┬─────────┬─────────┐" << endl;
+        for (int i = 0; i < N; i++) {
+            if (i > 0 && i % 3 == 0) {
+                cout << "├─────────┼─────────┼─────────┤" << endl;
+            }
+            cout << "│ ";
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] == 0) {
+                    cout << ". ";
+                } else {
+                    cout << board[i][j] << " ";
+                }
+                if ((j + 1) % 3 == 0) {
+                    cout << "│ ";
+                }
+            }
+            cout << endl;
+        }
+        cout << "└─────────┴─────────┴─────────┘" << endl;
+    }
+    
+    // Проверка корректности исходного судоку
+    bool isValidSudoku(vector<vector<int>>& board) {
+        // Проверяем строки
+        for (int i = 0; i < N; i++) {
+            vector<bool> seen(N + 1, false);
+            for (int j = 0; j < N; j++) {
+                int num = board[i][j];
+                if (num != 0) {
+                    if (seen[num]) return false;
+                    seen[num] = true;
+                }
+            }
+        }
+        
+        // Проверяем столбцы
+        for (int j = 0; j < N; j++) {
+            vector<bool> seen(N + 1, false);
+            for (int i = 0; i < N; i++) {
+                int num = board[i][j];
+                if (num != 0) {
+                    if (seen[num]) return false;
+                    seen[num] = true;
+                }
+            }
+        }
+        
+        // Проверяем квадраты 3x3
+        for (int block = 0; block < N; block++) {
+            vector<bool> seen(N + 1, false);
+            int startRow = (block / 3) * 3;
+            int startCol = (block % 3) * 3;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    int num = board[startRow + i][startCol + j];
+                    if (num != 0) {
+                        if (seen[num]) return false;
+                        seen[num] = true;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+};
+
+int main() {
+    SudokuSolver solver;
+    
+    // Пример сложного судоку
+    vector<vector<int>> board = {
+        {5, 3, 0, 0, 7, 0, 0, 0, 0},
+        {6, 0, 0, 1, 9, 5, 0, 0, 0},
+        {0, 9, 8, 0, 0, 0, 0, 6, 0},
+        {8, 0, 0, 0, 6, 0, 0, 0, 3},
+        {4, 0, 0, 8, 0, 3, 0, 0, 1},
+        {7, 0, 0, 0, 2, 0, 0, 0, 6},
+        {0, 6, 0, 0, 0, 0, 2, 8, 0},
+        {0, 0, 0, 4, 1, 9, 0, 0, 5},
+        {0, 0, 0, 0, 8, 0, 0, 7, 9}
+    };
+    
+    cout << "ИСХОДНОЕ СУДОКУ:" << endl;
+    solver.printSudoku(board);
+    
+    if (!solver.isValidSudoku(board)) {
+        cout << "Ошибка: исходное судоку некорректно!" << endl;
+        return 1;
+    }
+    
+    cout << "\nРЕШАЕМ..." << endl;
+    
+    if (solver.solveSudoku(board)) {
+        cout << "\nРЕШЕНИЕ НАЙДЕНО:" << endl;
+        solver.printSudoku(board);
+    } else {
+        cout << "Решение не найдено!" << endl;
+    }
+    
+    return 0;
+}
